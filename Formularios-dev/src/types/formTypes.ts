@@ -530,3 +530,5 @@ export interface UpdateExtintorData {
   activo?: boolean;
   inspeccionado?: boolean;
 }
+
+

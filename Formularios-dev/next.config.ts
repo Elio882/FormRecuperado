@@ -7,6 +7,12 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
 
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb', // Aumenta a 10MB
+    },
+  },
+
   async rewrites() {
     return [
       {
@@ -26,7 +32,7 @@ const nextConfig: NextConfig = {
           // Cabecera CSP (Content Security Policy)
           {
             key: 'Content-Security-Policy',
-            value: `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'  ${apiUrl} http://localhost:8080; frame-ancestors 'self';`
+            value: `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://res.cloudinary.com; font-src 'self'; connect-src 'self'  ${apiUrl} http://localhost:8080 https://res.cloudinary.com; frame-ancestors 'self';`
           },
           // Anti-Clickjacking
           {

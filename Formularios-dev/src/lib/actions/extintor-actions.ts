@@ -2,6 +2,8 @@
 "use server"
 
 import { ExtintorBackend } from "@/types/formTypes"
+import { getAuthHeaders, handleApiResponse } from "./helpers"
+import { API_BASE_URL } from "../constants"
 
 // Interfaces
 
@@ -33,30 +35,23 @@ interface FiltrosExtintor {
 }
 
 // URL base de tu API
-const API_BASE_URL = process.env.API_URL || 'http://localhost:3001'
 
 /**
  * Obtener todos los extintores
  */
 export async function obtenerExtintores(): Promise<ExtintorBackend[]> {
   try {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/extintor`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       cache: 'no-store',
-    })
+    });
 
-    if (!response.ok) {
-      throw new Error(`Error HTTP: ${response.status}`)
-    }
-
-    const data = await response.json()
-    return data
+    return handleApiResponse<ExtintorBackend[]>(response);
   } catch (error) {
-    console.error('Error al obtener extintores:', error)
-    throw new Error('No se pudieron cargar los extintores')
+    console.error('Error al obtener extintores:', error);
+    throw new Error('No se pudieron cargar los extintores');
   }
 }
 
@@ -65,33 +60,27 @@ export async function obtenerExtintores(): Promise<ExtintorBackend[]> {
  */
 export async function obtenerExtintoresFiltrados(filtros: FiltrosExtintor): Promise<ExtintorBackend[]> {
   try {
-    const params = new URLSearchParams()
+    const params = new URLSearchParams();
     
-    if (filtros.area) params.append('area', filtros.area)
-    if (filtros.tag) params.append('tag', filtros.tag)
-    if (filtros.codigo) params.append('codigo', filtros.codigo)
-    if (filtros.activo !== undefined) params.append('activo', filtros.activo.toString())
-    if (filtros.inspeccionado !== undefined) params.append('inspeccionado', filtros.inspeccionado.toString())
+    if (filtros.area) params.append('area', filtros.area);
+    if (filtros.tag) params.append('tag', filtros.tag);
+    if (filtros.codigo) params.append('codigo', filtros.codigo);
+    if (filtros.activo !== undefined) params.append('activo', filtros.activo.toString());
+    if (filtros.inspeccionado !== undefined) params.append('inspeccionado', filtros.inspeccionado.toString());
 
-    const url = `${API_BASE_URL}/extintor/filtrar?${params.toString()}`
+    const url = `${API_BASE_URL}/extintor/filtrar?${params.toString()}`;
     
+    const headers = await getAuthHeaders();
     const response = await fetch(url, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       cache: 'no-store',
-    })
+    });
 
-    if (!response.ok) {
-      throw new Error(`Error HTTP: ${response.status}`)
-    }
-
-    const data = await response.json()
-    return data
+    return handleApiResponse<ExtintorBackend[]>(response);
   } catch (error) {
-    console.error('Error al obtener extintores filtrados:', error)
-    throw new Error('No se pudieron cargar los extintores filtrados')
+    console.error('Error al obtener extintores filtrados:', error);
+    throw new Error('No se pudieron cargar los extintores filtrados');
   }
 }
 
@@ -100,23 +89,17 @@ export async function obtenerExtintoresFiltrados(filtros: FiltrosExtintor): Prom
  */
 export async function obtenerExtintorPorId(id: string): Promise<ExtintorBackend> {
   try {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/extintor/${id}`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       cache: 'no-store',
-    })
+    });
 
-    if (!response.ok) {
-      throw new Error(`Error HTTP: ${response.status}`)
-    }
-
-    const data = await response.json()
-    return data
+    return handleApiResponse<ExtintorBackend>(response);
   } catch (error) {
-    console.error('Error al obtener extintor por ID:', error)
-    throw new Error('No se pudo cargar el extintor')
+    console.error('Error al obtener extintor por ID:', error);
+    throw new Error('No se pudo cargar el extintor');
   }
 }
 
@@ -130,23 +113,22 @@ export async function obtenerExtintoresPorArea(area: string): Promise<{
   totalExtintoresActivosArea: number
 }> {
   try {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/extintor/area/${encodeURIComponent(area)}`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       cache: 'no-store',
-    })
+    });
 
-    if (!response.ok) {
-      throw new Error(`Error HTTP: ${response.status}`)
-    }
-
-    const data = await response.json()
-    return data
+    return handleApiResponse<{
+      success: boolean
+      extintores: ExtintorBackend[]
+      count: number
+      totalExtintoresActivosArea: number
+    }>(response);
   } catch (error) {
-    console.error('Error al obtener extintores por área:', error)
-    throw new Error('No se pudieron cargar los extintores del área')
+    console.error('Error al obtener extintores por área:', error);
+    throw new Error('No se pudieron cargar los extintores del área');
   }
 }
 
@@ -160,23 +142,22 @@ export async function obtenerExtintoresPorTag(tag: string): Promise<{
   totalExtintoresActivosArea: number
 }> {
   try {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/extintor/tag/${encodeURIComponent(tag)}`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       cache: 'no-store',
-    })
+    });
 
-    if (!response.ok) {
-      throw new Error(`Error HTTP: ${response.status}`)
-    }
-
-    const data = await response.json()
-    return data
+    return handleApiResponse<{
+      success: boolean
+      extintores: ExtintorBackend[]
+      count: number
+      totalExtintoresActivosArea: number
+    }>(response);
   } catch (error) {
-    console.error('Error al obtener extintores por tag:', error)
-    throw new Error('No se pudieron cargar los extintores del tag')
+    console.error('Error al obtener extintores por tag:', error);
+    throw new Error('No se pudieron cargar los extintores del tag');
   }
 }
 
@@ -185,27 +166,21 @@ export async function obtenerExtintoresPorTag(tag: string): Promise<{
  */
 export async function crearExtintor(extintor: CreateExtintorDto): Promise<ExtintorBackend> {
   try {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/extintor`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify(extintor),
-    })
+      cache: 'no-store',
+    });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null)
-      throw new Error(errorData?.message || `Error HTTP: ${response.status}`)
-    }
-
-    const data = await response.json()
-    return data
+    return handleApiResponse<ExtintorBackend>(response);
   } catch (error) {
-    console.error('Error al crear extintor:', error)
+    console.error('Error al crear extintor:', error);
     if (error instanceof Error) {
-      throw new Error(`No se pudo crear el extintor: ${error.message}`)
+      throw new Error(`No se pudo crear el extintor: ${error.message}`);
     }
-    throw new Error('No se pudo crear el extintor')
+    throw new Error('No se pudo crear el extintor');
   }
 }
 
@@ -214,27 +189,21 @@ export async function crearExtintor(extintor: CreateExtintorDto): Promise<Extint
  */
 export async function actualizarExtintor(id: string, extintor: UpdateExtintorDto): Promise<ExtintorBackend> {
   try {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/extintor/${id}`, {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify(extintor),
-    })
+      cache: 'no-store',
+    });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null)
-      throw new Error(errorData?.message || `Error HTTP: ${response.status}`)
-    }
-
-    const data = await response.json()
-    return data
+    return handleApiResponse<ExtintorBackend>(response);
   } catch (error) {
-    console.error('Error al actualizar extintor:', error)
+    console.error('Error al actualizar extintor:', error);
     if (error instanceof Error) {
-      throw new Error(`No se pudo actualizar el extintor: ${error.message}`)
+      throw new Error(`No se pudo actualizar el extintor: ${error.message}`);
     }
-    throw new Error('No se pudo actualizar el extintor')
+    throw new Error('No se pudo actualizar el extintor');
   }
 }
 
@@ -243,26 +212,21 @@ export async function actualizarExtintor(id: string, extintor: UpdateExtintorDto
  */
 export async function eliminarExtintor(id: string): Promise<{ success: boolean; message: string }> {
   try {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/extintor/${id}`, {
       method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+      headers,
+      cache: 'no-store',
+    });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null)
-      throw new Error(errorData?.message || `Error HTTP: ${response.status}`)
-    }
-
-    const data = await response.json()
-    return { success: true, message: data.message || 'Extintor eliminado correctamente' }
+    const data = await handleApiResponse<{ message?: string }>(response);
+    return { success: true, message: data.message || 'Extintor eliminado correctamente' };
   } catch (error) {
-    console.error('Error al eliminar extintor:', error)
+    console.error('Error al eliminar extintor:', error);
     if (error instanceof Error) {
-      throw new Error(`No se pudo eliminar el extintor: ${error.message}`)
+      throw new Error(`No se pudo eliminar el extintor: ${error.message}`);
     }
-    throw new Error('No se pudo eliminar el extintor')
+    throw new Error('No se pudo eliminar el extintor');
   }
 }
 
@@ -271,26 +235,20 @@ export async function eliminarExtintor(id: string): Promise<{ success: boolean; 
  */
 export async function desactivarExtintor(codigo: string): Promise<{ exito: boolean; mensaje: string }> {
   try {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/extintor/desactivar/${encodeURIComponent(codigo)}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+      headers,
+      cache: 'no-store',
+    });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null)
-      throw new Error(errorData?.message || `Error HTTP: ${response.status}`)
-    }
-
-    const data = await response.json()
-    return data
+    return handleApiResponse<{ exito: boolean; mensaje: string }>(response);
   } catch (error) {
-    console.error('Error al desactivar extintor:', error)
+    console.error('Error al desactivar extintor:', error);
     if (error instanceof Error) {
-      throw new Error(`No se pudo desactivar el extintor: ${error.message}`)
+      throw new Error(`No se pudo desactivar el extintor: ${error.message}`);
     }
-    throw new Error('No se pudo desactivar el extintor')
+    throw new Error('No se pudo desactivar el extintor');
   }
 }
 
@@ -299,27 +257,21 @@ export async function desactivarExtintor(codigo: string): Promise<{ exito: boole
  */
 export async function activarExtintor(id: string): Promise<ExtintorBackend> {
   try {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/extintor/${id}`, {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify({ activo: true }),
-    })
+      cache: 'no-store',
+    });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null)
-      throw new Error(errorData?.message || `Error HTTP: ${response.status}`)
-    }
-
-    const data = await response.json()
-    return data
+    return handleApiResponse<ExtintorBackend>(response);
   } catch (error) {
-    console.error('Error al activar extintor:', error)
+    console.error('Error al activar extintor:', error);
     if (error instanceof Error) {
-      throw new Error(`No se pudo activar el extintor: ${error.message}`)
+      throw new Error(`No se pudo activar el extintor: ${error.message}`);
     }
-    throw new Error('No se pudo activar el extintor')
+    throw new Error('No se pudo activar el extintor');
   }
 }
 
@@ -328,27 +280,21 @@ export async function activarExtintor(id: string): Promise<ExtintorBackend> {
  */
 export async function marcarExtintoresComoInspeccionados(codigosExtintores: string[]): Promise<{ modified: number }> {
   try {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/extintor/marcar-inspeccionados`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify({ codigosExtintores }),
-    })
+      cache: 'no-store',
+    });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null)
-      throw new Error(errorData?.message || `Error HTTP: ${response.status}`)
-    }
-
-    const data = await response.json()
-    return data
+    return handleApiResponse<{ modified: number }>(response);
   } catch (error) {
-    console.error('Error al marcar extintores como inspeccionados:', error)
+    console.error('Error al marcar extintores como inspeccionados:', error);
     if (error instanceof Error) {
-      throw new Error(`No se pudieron marcar los extintores: ${error.message}`)
+      throw new Error(`No se pudieron marcar los extintores: ${error.message}`);
     }
-    throw new Error('No se pudieron marcar los extintores como inspeccionados')
+    throw new Error('No se pudieron marcar los extintores como inspeccionados');
   }
 }
 
@@ -357,29 +303,23 @@ export async function marcarExtintoresComoInspeccionados(codigosExtintores: stri
  */
 export async function resetearEstadoInspeccion(codigosExtintores?: string[]): Promise<{ modified: number }> {
   try {
-    const body = codigosExtintores ? { codigosExtintores } : {}
+    const body = codigosExtintores ? { codigosExtintores } : {};
     
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/extintor/resetear-inspeccion`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify(body),
-    })
+      cache: 'no-store',
+    });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null)
-      throw new Error(errorData?.message || `Error HTTP: ${response.status}`)
-    }
-
-    const data = await response.json()
-    return data
+    return handleApiResponse<{ modified: number }>(response);
   } catch (error) {
-    console.error('Error al resetear estado de inspección:', error)
+    console.error('Error al resetear estado de inspección:', error);
     if (error instanceof Error) {
-      throw new Error(`No se pudo resetear el estado: ${error.message}`)
+      throw new Error(`No se pudo resetear el estado: ${error.message}`);
     }
-    throw new Error('No se pudo resetear el estado de inspección')
+    throw new Error('No se pudo resetear el estado de inspección');
   }
 }
 
@@ -392,26 +332,20 @@ export async function verificarYCrearExtintores(
   area: string
 ): Promise<{ creados: number; actualizados: number }> {
   try {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/extintor/verificar-crear`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify({ extintores, tag, area }),
-    })
+      cache: 'no-store',
+    });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null)
-      throw new Error(errorData?.message || `Error HTTP: ${response.status}`)
-    }
-
-    const data = await response.json()
-    return data
+    return handleApiResponse<{ creados: number; actualizados: number }>(response);
   } catch (error) {
-    console.error('Error al verificar y crear extintores:', error)
+    console.error('Error al verificar y crear extintores:', error);
     if (error instanceof Error) {
-      throw new Error(`No se pudieron verificar los extintores: ${error.message}`)
+      throw new Error(`No se pudieron verificar los extintores: ${error.message}`);
     }
-    throw new Error('No se pudieron verificar y crear los extintores')
+    throw new Error('No se pudieron verificar y crear los extintores');
   }
 }
